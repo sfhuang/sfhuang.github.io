@@ -1,2 +1,165 @@
-<head>test</head>
-this is a test.
+<html><head>
+<meta property="og:url" content="http://www.hsfideas.tw/fbliketrace/people2/" />
+<meta property="og:title" content="仁不要臉‧天下無敵‧讚數追蹤器" />
+<meta property="og:site_name" content="仁不要臉‧天下無敵‧讚數追蹤器"/>
+<meta property="og:image" content="http://i.imgur.com/wA7JnpH.png"/>
+<meta property="fb:app_id" content="658780054160575" />
+<meta property="og:type" content="website" />
+<meta property="og:description" content="仁不要臉‧天下無敵‧讚數追蹤器"/>
+<meta><title>仁不要臉‧天下無敵‧讚數追蹤器</title>
+
+<script type="text/javascript" src="//code.jquery.com/jquery-1.6.2.js"></script>
+<script id="facebook-jssdk" type="text/javascript" src="//connect.facebook.net/en_GB/sdk.js#xfbml=1&amp;version=v2.5"></script>
+
+<style type="text/css">
+body { margin: 30px auto; font-family: Helvetica, Arial, sans-serif; }
+#likes { font-size: 80px; width: 700px; margin: 0 auto; padding: 10px 0 20px; border: 0px solid #ccc; border-top: 0; }
+#likes2 { font-size: 80px; width: 700px; margin: 0 auto; padding: 10px 0 20px; border: 0px solid #ccc; border-top: 0; }
+#likes b { font-size: 80px; letter-spacing: -5px; }
+#likes2 b { font-size: 80px; letter-spacing: -5px; }
+#diffs { font-size: 60px; width: 700px; margin: 0 auto; padding: 10px 0 20px; border: 0px solid #ccc; border-top: 0; }
+#diffs2 { font-size: 60px; width: 700px; margin: 0 auto; padding: 10px 0 20px; border: 0px solid #ccc; border-top: 0; }
+.credit { font-size: 32px; }
+.explain { font-size: 16px; color: #999; }
+.share > div { transform-origin: center 0; transform: scale(1.5); }
+.hide { display: none; }
+.center { text-align: center; position: relative; }
+.fb-bgd { width: 100%; height: 313px; background-repeat: no-repeat; background-position: center; background-image: url(http://i.imgur.com/eabd9uh.png); }
+@keyframes fade-up { from {color: green;} to {color: black;} }
+@keyframes fade-down { from {color: red;} to {color: black;} }
+.up { animation: fade-up 1.5s ease-in-out; }
+.down { animation: fade-down 1.5s ease-in-out; }
+a:link { font-size:30px;text-decoration:none; color:orange}
+a:visited { font-size:30px;text-decoration:none; color:orange}
+a:active { font-size:30px;text-decoration:none; color:orange}
+a:hover { font-size:30px;color: red;}
+
+</style><script>
+function addCommas(nStr) { var x = nStr + ''; var rgx = /(\d+)(\d{3})/; while (rgx.test(x)) { x = x.replace(rgx, '$1' + ',' + '$2'); } return x; }
+var ori1=ori2=0;
+function addDiff(prev, now, k) 
+{ var same = '', diff = now + '', substr = 0; 
+	while (substr <= now.length && prev.substring(0, substr) == now.substring(0, substr)) 
+	{ same = now.substring(0, substr); 
+		diff = now.substring(substr, substr.length); 
+		substr++; 
+	} 
+	return same + "<span class='" + k + "'>" + diff + "</span>"; 
+}
+function fetchLikeCount() { return $.Deferred(function(defer) { 
+		$.getJSON('http://www.hsfideas.tw/test.php' ).done(function(data){try{
+		var count1 = data[0].like_count; 
+		var count2 = data[0].like_count2;
+		defer.resolve(count1,count2); 
+		} catch(e){reject();  } }, reject); 
+		function reject(){defer.reject(';('); }; }).promise(); }
+		$(function() 
+		{
+			var failed = false; 
+			var prevLikes = 9999999; 
+			var prevLikes2 = 9999999; 
+			var $likes = document.getElementById('likes'); 
+			var $likes2 = document.getElementById('likes2'); 
+			var $diffs = document.getElementById('diffs'); 
+			var $diffs2 = document.getElementById('diffs2'); 
+			function start() 
+			{
+				fetchLikeCount().always(function(likes,likes2) 
+				{
+					likes = parseInt(likes); 
+					likes2 = parseInt(likes2); 
+					
+					var klass = (likes > prevLikes ? 'up' : likes < prevLikes ? 'down' : ''); 
+					var klass2 = (likes2 > prevLikes2 ? 'up' : likes2 < prevLikes2 ? 'down' : ''); 
+
+					if (likes == ';(') 
+					{
+						failed = true; 
+						$('.explain').show(); $likes.innerHTML = "<b>熔斷機制</b>"; 
+					} 
+					else 
+					{
+						if(ori1==0)
+						{
+							ori1=likes;
+							prevLikes = likes; 
+						}
+						if(ori2==0)
+						{
+							ori2=likes2;
+							prevLikes2 = likes2; 
+						}
+
+						var diff = (likes-ori1);
+						var diff2 = (likes2-ori2);
+
+						if (diff > 0)
+						{
+							diffStr = addCommas(diff);
+							$diffs.innerHTML="<span style='color:green'>▲&nbsp;"+diffStr+"<span>";
+						}
+						else if (diff < 0)
+						{
+							diff=-diff;
+							diffStr = addCommas(diff);
+							$diffs.innerHTML="<span style='color:red'>▼&nbsp;"+diffStr+"<span>";
+						}
+						else
+						{
+							$diffs.innerHTML="<span style='color:'>-<span>";
+						}
+
+						if (diff2 > 0)
+						{
+							diffStr2 = addCommas(diff2);
+							$diffs2.innerHTML="<span style='color:green'>▲&nbsp;"+diffStr2+"<span>";
+						}
+						else if (diff2 < 0)
+						{
+							diff2=-diff2;
+							diffStr2 = addCommas(diff2);
+							$diffs2.innerHTML="<span style='color:red'>▼&nbsp;"+diffStr2+"<span>";
+						}
+						else
+						{
+							$diffs2.innerHTML="<span style='color:'>-<span>";
+						}
+
+						prevLikesStr = addCommas(prevLikes); 
+						prevLikesStr2 = addCommas(prevLikes2); 
+
+						likesStr = addCommas(likes); 
+						likesStr2 = addCommas(likes2); 
+
+						$likes.innerHTML = "<b>" + addDiff(prevLikesStr, likesStr, klass) + "</b> 個讚"; 
+						$likes2.innerHTML = "<b>" + addDiff(prevLikesStr2, likesStr2, klass2) + "</b> 個讚"; 
+
+					} 
+					prevLikes = likes; 
+					prevLikes2 = likes2; 
+					if (!failed) 
+					{
+						setTimeout(function() { start(); }, 5000); 
+					}
+				}); } 
+			start(); });
+</script></head>
+<body>
+	<div id="fb-root"></div><div class="fb-bgd"></div>
+	<div class="center"><center>
+	<table border=0>
+	<tr>
+	<td><a href="https://www.facebook.com/people2" target=p2fbpage1>◤人2 x People2</a><br><span id="likes" class="center"></span></td>
+	<td style="width:30px"></td>
+	<td><a href="https://www.facebook.com/IlluPlanet" target=p2fbpage2>◤人2的插画星球 @IlluPlanet</a><br><span id="likes2" class="center"></span></td>
+	</tr>
+	<tr><td align=right><span id="diffs" class="center">0</span></td></td><td><td align=right><span id="diffs2" class="center">0</span></td></tr>
+	</table><br><br>
+	</div>
+<div class="explain center hide">＊同一個 IP 看太久會觸發熔斷機制（Facebook 限制），歡迎稍後再來倒數＊</div>
+<br/><center>
+	相關活動：<a href='https://www.facebook.com/events/1087962081241909/' target='myEvent'>「仁不要臉．天下無敵」の退讚行動</a>&nbsp;／&nbsp;<a href='https://www.facebook.com/events/901655869961557/' target='otherEvent'>我是人，我反仁。</a><br>
+	<br>Inspired by <a href='https://s3-ap-southeast-1.amazonaws.com/d74689/DislikeShowLo.html' style='font-size:16px' target=_blank>羅志祥 Dislike Counter</a>&nbsp;※&nbsp;Enhanced By <a href='https://www.facebook.com/shengfeng.huang.9' style='font-size:16px' target=_blank>Ng Sìng-Hong</a></center><br/>
+<div class="share center"><div class="fb-share-button" data-href="http://www.hsfideas.tw/fbliketrace/people2/" data-layout="button_count"></div></div>
+</body>
+</html>
